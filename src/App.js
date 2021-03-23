@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import { addPosts } from './redux/actions';
 import axios from 'axios';
 
-function App({ posts }) {
+import { PostCard } from './components';
+
+function App({ posts, addPostsToState }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ function App({ posts }) {
           posts.forEach(post => {
             post.comments = comments.filter((comment) => comment.postId === post.id)
           });
-          addPosts(posts);
+          addPostsToState(posts);
         })
         .finally(function() {
           setLoading(false);
@@ -39,7 +41,18 @@ function App({ posts }) {
 
   return (
     <div>
-      Test
+      {posts.length === 0 || loading
+        ? (
+          <div>Loading...</div>)
+        : (
+          <PostCard
+            post={posts[0]}
+            onCommentsClicked={(post) => {
+              console.log('show comments of post - ', post.id);
+            }}
+          />
+        )
+      }
     </div>
   );
 }
@@ -52,7 +65,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addPosts: (posts) => dispatch(addPosts(posts))
+    addPostsToState: (posts) => dispatch(addPosts(posts))
   };
 };
 

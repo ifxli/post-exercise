@@ -22,6 +22,7 @@ export const PostCard = ({ post, onCommentsClicked }) => {
         <Typography variant="h5" component="h2">
           {post.title}
         </Typography>
+        <br></br>
         <Typography variant="body2" component="p">
           {post.body}
         </Typography>

@@ -9,7 +9,11 @@ import Typography from '@material-ui/core/Typography';
 const useStyles = makeStyles({
   root: {
     minWidth: 275,
-    maxWidth: 500
+    maxWidth: 500,
+    marginBottom: 10
+  },
+  actionButton: {
+    marginLeft: 'auto'
   }
 });
 
@@ -28,7 +32,13 @@ export const PostCard = ({ post, onCommentsClicked }) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={() => onCommentsClicked(post)}>{post.comments.length} comment(s)</Button>
+        <Button
+          className={classes.actionButton}
+          size="small"
+          onClick={() => onCommentsClicked(post)}
+        >
+          {post.comments.length} comment(s)
+        </Button>
       </CardActions>
     </Card>
   );

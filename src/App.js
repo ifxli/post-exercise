@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Container from '@material-ui/core/Container';
@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
 import { addPosts } from './redux/actions';
 import axios from 'axios';
 
-import { Header, PostCard } from './components';
+import { Header, PostList } from './components';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,11 +38,9 @@ function ScrollTop(props) {
     threshold: 100,
   });
 
-  const handleClick = (event) => {
-    const anchor = (event.target.ownerDocument || document).querySelector('#back-to-top-anchor');
-
-    if (anchor) {
-      anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const handleClick = () => {
+    if (props.anchor) {
+      props.anchor.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
@@ -58,6 +56,7 @@ function ScrollTop(props) {
 function App({ posts, addPostsToState }) {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
+  const anchorRef = useRef(null);
 
   useEffect(() => {
     async function fetchPostsAndComments() {
@@ -93,24 +92,24 @@ function App({ posts, addPostsToState }) {
   return (
     <div>
       <Header />
-      <Toolbar id="back-to-top-anchor" />
+      <Toolbar ref={anchorRef} />
       <Container>
         <Box my={3} className={classes.container}>
           {posts.length === 0 || loading
             ? (
               <CircularProgress />
             ) : (
-              <PostCard
-                post={posts[0]}
-                onCommentsClicked={(post) => {
-                  console.log('show comments of post - ', post.id);
+              <PostList
+                posts={posts}
+                onCommentsClickedAt={(post) => {
+                  console.log('comments clicked at index - ', post.id);
                 }}
               />
             )
           }
         </Box>
       </Container>
-      <ScrollTop>
+      <ScrollTop anchor={anchorRef} >
         <Fab color="secondary" size="small" aria-label="scroll back to top">
           <KeyboardArrowUpIcon />
         </Fab>

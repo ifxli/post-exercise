@@ -14,7 +14,11 @@ const postReducer = (state = initialState, action) => {
       const { comment, postId } = action.payload;
       let tempPosts = [...state.posts];
       let post = tempPosts.find((post) => post.id === postId);
-      post.comments.push(comment);
+      post.comments.splice(0, 0, {
+        name: 'Felix',
+        email: 'fxlisoft@gmail.com',
+        body: comment
+      });
       return {
         posts: tempPosts
       }

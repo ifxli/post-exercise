@@ -3,59 +3,24 @@ import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import useScrollTrigger from '@material-ui/core/useScrollTrigger';
-import Fab from '@material-ui/core/Fab';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import Zoom from '@material-ui/core/Zoom';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
-import { addPosts } from './redux/actions';
+import { addComment, addPosts } from './redux/actions';
 import axios from 'axios';
 
-import { Header, PostList } from './components';
+import { Header, PostList, ScrollTop, CommentsDialog } from './components';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    position: 'fixed',
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
-  },
+const useStyles = makeStyles(() => ({
   container: {
     display: 'flex',
     justifyContent: 'center'
   }
 }));
 
-function ScrollTop(props) {
-  const { children, window } = props;
-  const classes = useStyles();
-  // Note that you normally won't need to set the window ref as useScrollTrigger
-  // will default to window.
-  // This is only being set here because the demo is in an iframe.
-  const trigger = useScrollTrigger({
-    target: window ? window() : undefined,
-    disableHysteresis: true,
-    threshold: 100,
-  });
-
-  const handleClick = () => {
-    if (props.anchor) {
-      props.anchor.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
-
-  return (
-    <Zoom in={trigger}>
-      <div onClick={handleClick} role="presentation" className={classes.root}>
-        {children}
-      </div>
-    </Zoom>
-  );
-}
-
-function App({ posts, addPostsToState }) {
+function App({ posts, addPostsToState, addCommentToPost }) {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
   const anchorRef = useRef(null);
 
   useEffect(() => {
@@ -95,25 +60,26 @@ function App({ posts, addPostsToState }) {
       <Toolbar ref={anchorRef} />
       <Container>
         <Box my={3} className={classes.container}>
-          {posts.length === 0 || loading
-            ? (
-              <CircularProgress />
-            ) : (
-              <PostList
-                posts={posts}
-                onCommentsClickedAt={(post) => {
-                  console.log('comments clicked at index - ', post.id);
-                }}
-              />
-            )
-          }
+          {posts.length === 0 || loading ? (
+            <CircularProgress />
+          ) : (
+            <PostList
+              posts={posts}
+              onCommentsClickedAt={(post) => {
+                setSelectedPost(post);
+              }}
+            />
+          )}
         </Box>
       </Container>
-      <ScrollTop anchor={anchorRef} >
-        <Fab color="secondary" size="small" aria-label="scroll back to top">
-          <KeyboardArrowUpIcon />
-        </Fab>
-      </ScrollTop>
+      <ScrollTop anchor={anchorRef} />
+      {selectedPost && (
+        <CommentsDialog
+          post={selectedPost}
+          onAddComment={(comment, postId) => addCommentToPost(comment, postId)}
+          onDialogClose={() => setSelectedPost(null)} 
+        />
+      )}
     </div>
   );
 }
@@ -126,7 +92,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addPostsToState: (posts) => dispatch(addPosts(posts))
+    addPostsToState: (posts) => dispatch(addPosts(posts)),
+    addCommentToPost: (comment, postId) => dispatch(addComment(comment, postId))
   };
 };
 

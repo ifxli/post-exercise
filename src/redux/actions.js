@@ -9,7 +9,7 @@ export const addPosts = (posts) => {
   } 
 };
 
-export const addComment = ({ comment, postId }) => ({
+export const addComment = (comment, postId) => ({
   type: ADD_COMMENT,
   payload: {
     comment,

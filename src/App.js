@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import { addPosts } from './redux/actions';
+import axios from 'axios';
 
-function App() {
+function App({ posts }) {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchPostsAndComments() {
+      setLoading(true);
+
+      let fetchPostsUrl = 'https://jsonplaceholder.typicode.com/posts';
+      let fetchCommentsUrl = 'https://jsonplaceholder.typicode.com/comments';
+      
+      let promiseCalls = [axios(fetchPostsUrl), axios(fetchCommentsUrl)];
+      Promise.all(promiseCalls)
+        .then(function(responses) {
+          return Promise.all(responses.map(function (response) {
+            return response.data;
+          }));
+        })
+        .then(function(data) {
+          let posts = data[0];
+          let comments = data[1];
+          posts.forEach(post => {
+            post.comments = comments.filter((comment) => comment.postId === post.id)
+          });
+          addPosts(posts);
+        })
+        .finally(function() {
+          setLoading(false);
+        })
+    }
+    if (posts.length === 0) {
+      fetchPostsAndComments();
+    }
+  }, [posts]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      Test
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    posts: state.postReducer.posts
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addPosts: (posts) => dispatch(addPosts(posts))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

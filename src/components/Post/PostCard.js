@@ -21,13 +21,13 @@ export const PostCard = ({ post, onCommentsClicked }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.root}>
+    <Card className={classes.root} data-testid="post-card">
       <CardContent>
         <Typography variant="h5" component="h2">
           {post.title}
         </Typography>
         <br></br>
-        <Typography variant="body2" component="p">
+        <Typography variant="body2" component="p" data-testid="body-text">
           {post.body}
         </Typography>
       </CardContent>
@@ -36,6 +36,7 @@ export const PostCard = ({ post, onCommentsClicked }) => {
           className={classes.actionButton}
           size="small"
           onClick={() => onCommentsClicked(post)}
+          role="comments-button"
         >
           {post.comments.length} comment(s)
         </Button>

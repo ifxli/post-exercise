@@ -32,7 +32,7 @@ const DialogTitle = withStyles(styles)((props) => {
     <MuiDialogTitle disableTypography className={classes.root} {...other}>
       <Typography variant="h6">{children}</Typography>
       {onClose ? (
-        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose} data-testid="close-button">
           <CloseIcon />
         </IconButton>
       ) : null}
@@ -84,7 +84,11 @@ export default function CustomizedDialogs({ post, onDialogClose, onAddComment })
       aria-labelledby="customized-dialog-title"
       open={true}
     >
-      <DialogTitle id="customized-dialog-title" onClose={onDialogClose}>
+      <DialogTitle
+        id="customized-dialog-title"
+        onClose={onDialogClose}
+        data-testid="dialog-title"
+      >
         Post Detail
       </DialogTitle>
       <DialogContent dividers>
@@ -100,6 +104,7 @@ export default function CustomizedDialogs({ post, onDialogClose, onAddComment })
               fullWidth
               value={newComment}
               onChange={onCommentChange}
+              data-testid="comment-input"
             />
             <Button
               onClick={() => {
@@ -109,6 +114,7 @@ export default function CustomizedDialogs({ post, onDialogClose, onAddComment })
                 }
               }} 
               color="primary"
+              data-testid="comment-button"
             >
               Comment
             </Button>
